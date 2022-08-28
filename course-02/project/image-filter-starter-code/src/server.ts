@@ -1,4 +1,4 @@
-import express from 'express';
+import express, {Request, Response } from 'express';
 import bodyParser from 'body-parser';
 import {filterImageFromURL, deleteLocalFiles} from './util/util';
 
@@ -30,6 +30,25 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   /**************************************************************************** */
 
   //! END @TODO1
+  app.get("/filteredimage",
+   async (req: Request , res: Response) => {
+    // Get the image url from query param
+    const { image_url } :{image_url:string} = req.query;
+
+    // 1. validate the image_url query
+    if (!isImgUrl(image_url)) {
+      // invalid url image reponse
+      
+      res.status(400).send("The image url is invalid!");
+      return;
+    }
+});
+
+// check image url
+function isImgUrl(url : any) {
+  if(typeof url !== 'string' || !url || url === "") return false;
+  return(url.match(/^http[^\?]*.(jpg|jpeg|png|bmp)(\?(.*))?$/gmi) != null);
+}
   
   // Root Endpoint
   // Displays a simple message to the user
