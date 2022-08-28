@@ -45,7 +45,7 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
 });
 
 // check image url
-function isImgUrl(url : any) {
+function isImgUrl(url : string) {
   if(typeof url !== 'string' || !url || url === "") return false;
   return(url.match(/^http[^\?]*.(jpg|jpeg|png|bmp)(\?(.*))?$/gmi) != null);
 }
