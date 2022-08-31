@@ -32,23 +32,47 @@ import {filterImageFromURL, deleteLocalFiles} from './util/util';
   //! END @TODO1
   app.get("/filteredimage",
    async (req: Request , res: Response) => {
-    // Get the image url from query param
+    // Get the image url
     const { image_url } :{image_url:string} = req.query;
 
-    // 1. validate the image_url query
+    // validate the image_url query
     if (!isImgUrl(image_url)) {
       // invalid url image reponse
       
-      res.status(400).send("The image url is invalid!");
-      return;
+      return res.status(400).send("The image url is invalid!");
     }
-});
 
-// check image url
-function isImgUrl(url : string) {
+    // 2. call filterImageFromURL(image_url) to filter the image
+    await filterImageFromURL(image_url).then(
+
+      // Read image successfull
+      function(image) {
+
+        // 3. send the resulting file in the response
+        res.sendFile(image, async (error: Error) => {
+          if (error) {
+            // Internal server error response
+            res.status(500).send(error.message);
+          } else {
+
+            // 4. deletes any files on the server on finish of the response
+            await deleteLocalFiles([image]);
+            res.status(200).statusMessage;
+          }
+        });
+      },
+      function(error: Error) {
+        // Internal server error response
+        res.status(500).send(error.message);
+      }
+    );
+  });
+
+  // check image url
+  function isImgUrl(url : string) {
   if(typeof url !== 'string' || !url || url === "") return false;
   return(url.match(/^http[^\?]*.(jpg|jpeg|png|bmp)(\?(.*))?$/gmi) != null);
-}
+  }
   
   // Root Endpoint
   // Displays a simple message to the user
